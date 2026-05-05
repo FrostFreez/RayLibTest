@@ -1,6 +1,8 @@
 #include "raylib.h"
 #include <iostream>
 #include <string>
+#include <vector>
+#include <cmath>
 
 void static DisplayName(std::string name, int fontSize, Vector2 center)
 {
@@ -44,38 +46,31 @@ void static SwitchWindowMode() {
 class Circle
 {
 public:
-	int x = 0, y = 0, radius = 100;
+	float x = 0, y = 0, radius = 100;
 	Color color = RED;
 
-private:
-	bool focused = false;
-
 public:
-	Circle(int x, int y, int radius, Color color) : x(x), y(y), radius(radius), color(color) {}
-
+	Circle(float x, float y, float radius, Color color) : x(x), y(y), radius(radius), color(color) {}
 	void Draw()
 	{
 		DrawCircle(x, y, radius, color);
 	}
 
-	void Click()
+	bool Click()
 	{
 		Vector2 mousePos = GetMousePosition();
-		if (focused) {
-			focused = false;
-		}
-		else {
-			focused = (mousePos.x - x) * (mousePos.x - x) + (mousePos.y - y) * (mousePos.y - y) <= radius * radius;
-		}
+		return (mousePos.x - x) * (mousePos.x - x) + (mousePos.y - y) * (mousePos.y - y) <= radius * radius;
 	}
 
-	void Update()
+	void Move(int x, int y)
 	{
-		Vector2 mouseDelta = GetMouseDelta();
-		if (focused) {
-			x += mouseDelta.x;
-			y += mouseDelta.y;
-		}
+		this->x += x;
+		this->y += y;
+	}
+	void Move(Vector2 move)
+	{
+		this->x += move.x;
+		this->y += move.y;
 	}
 };
 
@@ -90,32 +85,121 @@ void static BlendColor(Circle circles[3])
 
 int main()
 {
-	InitWindow(800, 450, "Hello Raylib!");
+	InitWindow(800, 800, "Hello Raylib!");
 
 	Circle circles[3] = {
-		Circle(GetScreenWidth() / 2, GetScreenHeight() / 2 - 50 * sqrt(3), 100, RED),
-		Circle(GetScreenWidth() / 2 - 50, GetScreenHeight() / 2, 100, GREEN),
-		Circle(GetScreenWidth() / 2 + 50, GetScreenHeight() / 2, 100, BLUE)
+		Circle(GetScreenWidth() / 2, GetScreenHeight() / 2 - 50 * sqrt(3), 20, RED),
+		Circle(GetScreenWidth() / 2 - 50, GetScreenHeight() / 2, 20, GREEN),
+		Circle(GetScreenWidth() / 2 + 50, GetScreenHeight() / 2, 20, BLUE)
 	};
+	Circle* focusedCircle = nullptr;
+	Vector2 direction = { 1, 1 };
+	Vector2 reverseCooldown = { 0, 0 };
+
+	std::vector<Circle*> circlesPtr = {};
+
+	std::vector<Circle*> trail = {};
+	int frameCount = 0;
+	int maxTrailLength = 134;
+	trail.resize(maxTrailLength);
 
 	SetTargetFPS(60);
 	while (!WindowShouldClose())
 	{
 		BeginDrawing();
-		ClearBackground(BLACK);
+		ClearBackground(RAYWHITE);
+
+		reverseCooldown.x -= 1;
+		reverseCooldown.y -= 1;
 
 		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+			bool clickedOnCircle = false;
 			for (int i = 0; i < 3; i++) {
-				circles[i].Click();
+				if (circles[i].Click() && focusedCircle != &circles[i]) {
+					focusedCircle = &circles[i];
+					clickedOnCircle = true;
+					break;
+				}
+			}
+			if (!clickedOnCircle) {
+				focusedCircle = nullptr;
 			}
 		}
-		for (int i = 0; i < 3; i++) {
-			circles[i].Update();
+		if (focusedCircle != nullptr) {
+
+			if (GetScreenWidth() - focusedCircle->x < focusedCircle->radius || focusedCircle->x < focusedCircle->radius
+				&& reverseCooldown.x <= 0) {
+				direction.x = copysignf(GetRandomValue(3, 8), -direction.x);
+				Color newColor = Color();
+				newColor.r = GetRandomValue(0, 255);
+				newColor.g = GetRandomValue(0, 255);
+				newColor.b = GetRandomValue(0, 255);
+				newColor.a = 255;
+				circlesPtr.push_back(new Circle(focusedCircle->x, focusedCircle->y, focusedCircle->radius, newColor));
+				focusedCircle = circlesPtr[circlesPtr.size() - 1];
+				reverseCooldown.x = 10;
+			}
+			if (GetScreenHeight() - focusedCircle->y < focusedCircle->radius || focusedCircle->y < focusedCircle->radius
+				&& reverseCooldown.y <= 0) {
+				direction.y = copysignf(GetRandomValue(3, 8), -direction.y);
+				Color newColor = Color();
+				newColor.r = GetRandomValue(0, 255);
+				newColor.g = GetRandomValue(0, 255);
+				newColor.b = GetRandomValue(0, 255);
+				newColor.a = 255;
+				circlesPtr.push_back(new Circle(focusedCircle->x, focusedCircle->y, focusedCircle->radius, newColor));
+				focusedCircle = circlesPtr[circlesPtr.size() - 1];
+				reverseCooldown.y = 10;
+			}
+
+			if (trail[frameCount])
+			{
+				delete trail[frameCount];
+				trail[frameCount] = nullptr;
+			}
+
+			trail[frameCount] = new Circle(focusedCircle->x, focusedCircle->y, focusedCircle->radius, focusedCircle->color);
+			frameCount = (frameCount + 1) % maxTrailLength;
+
+			focusedCircle->Move(direction);
 		}
-		BlendColor(circles);
+
+		std::vector<Vector2> vertices = {
+			{ circles[0].x, circles[0].y },
+			{ circles[1].x, circles[1].y },
+			{ circles[2].x, circles[2].y }
+		};
+
+		DrawTriangle({ circles[0].x, circles[0].y }, { circles[1].x, circles[1].y }, { circles[2].x, circles[2].y }, BLACK);
+
+		for (auto& circle : circles)
+		{
+			circle.Draw();
+		}
+
+		for (auto& circlePtr : circlesPtr)
+		{
+			circlePtr->Draw();
+		}
+
+		for (int i = 0; i < maxTrailLength; i++) {
+			if (trail[i] != nullptr && trail[i]->radius > 0.1f) {
+				trail[i]->Draw();
+				trail[i]->radius -= 0.15f;
+			}
+			else {
+				delete trail[i];
+				trail[i] = nullptr;
+			}
+		}
 
 		EndDrawing();
+
 	}
+	for (int i = 0; i < circlesPtr.size(); i++) {
+		delete circlesPtr[i];
+	}
+	circlesPtr.clear();
 
 	CloseWindow();
 
