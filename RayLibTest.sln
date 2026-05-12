@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BigCircle", "BigCircle\BigC
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HypothrocoidSimulator", "HypothrocoidSimulator\HypothrocoidSimulator.vcxproj", "{A3428E9D-B8EE-460E-96C3-369B2F1B9890}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WallBreaking", "WallBraking\WallBreaking.vcxproj", "{62F18B8A-1B15-4C5B-B1D0-66D94E6B4C18}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -61,6 +63,14 @@ Global
 		{A3428E9D-B8EE-460E-96C3-369B2F1B9890}.Release|x64.Build.0 = Release|x64
 		{A3428E9D-B8EE-460E-96C3-369B2F1B9890}.Release|x86.ActiveCfg = Release|Win32
 		{A3428E9D-B8EE-460E-96C3-369B2F1B9890}.Release|x86.Build.0 = Release|Win32
+		{62F18B8A-1B15-4C5B-B1D0-66D94E6B4C18}.Debug|x64.ActiveCfg = Debug|x64
+		{62F18B8A-1B15-4C5B-B1D0-66D94E6B4C18}.Debug|x64.Build.0 = Debug|x64
+		{62F18B8A-1B15-4C5B-B1D0-66D94E6B4C18}.Debug|x86.ActiveCfg = Debug|Win32
+		{62F18B8A-1B15-4C5B-B1D0-66D94E6B4C18}.Debug|x86.Build.0 = Debug|Win32
+		{62F18B8A-1B15-4C5B-B1D0-66D94E6B4C18}.Release|x64.ActiveCfg = Release|x64
+		{62F18B8A-1B15-4C5B-B1D0-66D94E6B4C18}.Release|x64.Build.0 = Release|x64
+		{62F18B8A-1B15-4C5B-B1D0-66D94E6B4C18}.Release|x86.ActiveCfg = Release|Win32
+		{62F18B8A-1B15-4C5B-B1D0-66D94E6B4C18}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
