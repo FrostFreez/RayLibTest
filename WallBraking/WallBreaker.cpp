@@ -49,12 +49,12 @@ void WallBreaker::Start()
 
 #pragma region Lives
 
-	for (int i = 0; i < life.size(); i++)
+	for (int i = 0; i < lives.size(); i++)
 	{
-		life[i].borderSize = 5;
-		life[i].rect = Rectangle{(float)GAP, (float)(screenHeight - LIFE_SIZE - GAP) - (GAP + LIFE_SIZE) * i, LIFE_SIZE, LIFE_SIZE};
-		life[i].outsideColor = SKYBLUE;
-		life[i].insideColor = GREEN;
+		lives[i].borderSize = 5;
+		lives[i].rect = Rectangle{(float)GAP, (float)(screenHeight - LIFE_SIZE - GAP) - (GAP + LIFE_SIZE) * i, LIFE_SIZE, LIFE_SIZE};
+		lives[i].outsideColor = SKYBLUE;
+		lives[i].insideColor = GREEN;
 	}
 
 #pragma endregion
@@ -165,15 +165,15 @@ void WallBreaker::Update()
 				activeScreen = &loseMenu;
 				restart = true;
 			}
-			for (int i = 0; i < life.size(); i++)
+			for (int i = 0; i < lives.size(); i++)
 			{
 				if (i < player.lives)
 				{
-					life[i].active = true;
+					lives[i].active = true;
 				}
 				else
 				{
-					life[i].active = false;
+					lives[i].active = false;
 				}
 			}
 		}
@@ -190,7 +190,7 @@ void WallBreaker::Update()
 	{
 		activeScreen->Draw();
 	}
-	for (Life& l : life)
+	for (Life& l : lives)
 	{
 		l.Draw();
 	}

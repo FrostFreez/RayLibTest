@@ -122,7 +122,7 @@ public:
 	Ball ball;
 	std::vector<Brick> bricks;
 
-	std::array<Life, 5> life;
+	std::array<Life, 5> lives;
 
 	CustomScreen pauseMenu;
 	CustomScreen winMenu;
